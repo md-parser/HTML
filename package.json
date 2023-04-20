@@ -1,0 +1,38 @@
+{
+  "name": "@md-parser/html-formatter",
+  "version": "0.0.1",
+  "description": "HTML formatter for parsed markdown",
+  "repository": "https://github.com/md-parser/HTML",
+  "author": "Marten de Groot <marten.dr.degroot@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "test": "vitest --threads=false",
+    "coverage": "vitest run --coverage",
+    "build": "rm -rf ./dist/ && ts-node-esm ./build.ts && tsc --emitDeclarationOnly --outDir dist && rm -rf ./dist/tests/",
+    "ts": "tsc --noemit --project ./tsconfig.json",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src/",
+    "nodemon": "nodemon --watch src --ext ts --exec \"yarn run build\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "@vitest/coverage-c8": "^0.30.1",
+    "esbuild": "^0.17.17",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unicorn": "^46.0.0",
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.7",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4",
+    "vitest": "^0.30.1"
+  }
+}
