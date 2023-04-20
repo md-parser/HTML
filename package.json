@@ -1,7 +1,8 @@
 {
-  "name": "@md-parser/html-formatter",
+  "name": "@md-parser/html-renderer",
   "version": "0.0.1",
-  "description": "HTML formatter for parsed markdown",
+  "description": "HTML renderer for parsed markdown",
+  "main": "dist/index.esm.js",
   "repository": "https://github.com/md-parser/HTML",
   "author": "Marten de Groot <marten.dr.degroot@gmail.com>",
   "license": "MIT",
