@@ -1,55 +1,12 @@
-import { parseMarkdown, MarkdownNode } from '@saartje87/md-ast';
+import { parseMarkdown, MarkdownNode, ParserConfig } from '@md-parser/parser';
 
-export type MapMarkdownNodeToReactNode<T extends MarkdownNode> = {
-  [K in T['type']]: ConvertMarkdownNodeToReactProps<Extract<T, { type: K }>>;
+export const renderHTML = (markdown: string, config: ParserConfig) => {
+  const nodes = parseMarkdown(markdown, config);
+
+  return renderNode(nodes);
 };
 
-// Convert MarkdownNode to ReactNode
-export type ConvertMarkdownNodeToReactProps<T extends MarkdownNode> = {
-  [K in Exclude<keyof T, 'type'>]: T[K] extends MarkdownNode | MarkdownNode[] ? string : T[K];
-};
-
-export type MarkdownComponents = {
-  blockquote: MapMarkdownNodeToReactNode<MarkdownNode>['blockquote'];
-  code: MapMarkdownNodeToReactNode<MarkdownNode>['code'];
-  divider: MapMarkdownNodeToReactNode<MarkdownNode>['divider'];
-  heading: MapMarkdownNodeToReactNode<MarkdownNode>['heading'];
-  image: MapMarkdownNodeToReactNode<MarkdownNode>['image'];
-  inlineCode: MapMarkdownNodeToReactNode<MarkdownNode>['inlineCode'];
-  italic: MapMarkdownNodeToReactNode<MarkdownNode>['italic'];
-  link: MapMarkdownNodeToReactNode<MarkdownNode>['link'];
-  list: MapMarkdownNodeToReactNode<MarkdownNode>['list'];
-  listItem: MapMarkdownNodeToReactNode<MarkdownNode>['listItem'];
-  paragraph: MapMarkdownNodeToReactNode<MarkdownNode>['paragraph'];
-  strikeThrough: MapMarkdownNodeToReactNode<MarkdownNode>['strikeThrough'];
-  strong: MapMarkdownNodeToReactNode<MarkdownNode>['strong'];
-  subscript: MapMarkdownNodeToReactNode<MarkdownNode>['subscript'];
-  superscript: MapMarkdownNodeToReactNode<MarkdownNode>['superscript'];
-  table: MapMarkdownNodeToReactNode<MarkdownNode>['table'];
-  tableRow: MapMarkdownNodeToReactNode<MarkdownNode>['tableRow'];
-  tableData: MapMarkdownNodeToReactNode<MarkdownNode>['tableData'];
-  tableHeader: MapMarkdownNodeToReactNode<MarkdownNode>['tableHeader'];
-};
-
-export type MarkdownRendererProps = {
-  children: string;
-  components: Partial<MarkdownComponents>;
-};
-
-export const markdownParser = ({ children, components }: MarkdownRendererProps) => {
-  const ast = parseMarkdown(children || '');
-
-  return renderHTML({ nodes: ast, components });
-};
-
-export type MarkdownASTRendererProps = {
-  components: MarkdownRendererProps['components'];
-  nodes: MarkdownNode[];
-  // We use this to prevent React from complaining about missing keys
-  keyPrefix?: string;
-};
-
-export const renderHTML = ({ nodes, components }: MarkdownASTRendererProps): string =>
+const renderNode = (nodes: MarkdownNode[]): string =>
   nodes
     .map((node) => {
       if (node.type === 'text') {
@@ -62,19 +19,13 @@ export const renderHTML = ({ nodes, components }: MarkdownASTRendererProps): str
 
       switch (node.type) {
         case 'heading': {
-          return `<h${node.level}>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</h${node.level}>`;
+          return `<h${node.level}>${renderNode(node.children)}</h${node.level}>`;
         }
         case 'image': {
           return `<img src="${node.src}" alt="${node.alt}" title="${node.title}" />`;
         }
         case 'link': {
-          return `<a href="${node.href}" title="${node.title}">${renderHTML({
-            nodes: node.children,
-            components,
-          })}</a>`;
+          return `<a href="${node.href}" title="${node.title}">${renderNode(node.children)}</a>`;
         }
         case 'inlineCode': {
           return `<pre>${node.value}</pre>`;
@@ -87,82 +38,47 @@ export const renderHTML = ({ nodes, components }: MarkdownASTRendererProps): str
         }
         case 'list': {
           const tag = node.ordered ? 'ol' : 'ul';
-          return `<${tag}${!!node.start && ` start=${node.start}`}>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</${tag}>`;
+          return `<${tag}${!!node.start && ` start=${node.start}`}>${renderNode(
+            node.children,
+          )}</${tag}>`;
         }
         case 'listItem': {
-          return `<li>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</li>`;
+          return `<li>${renderNode(node.children)}</li>`;
         }
         case 'table': {
-          return `<table><thead>${renderHTML({
-            nodes: [node.header],
-            components,
-          })}</thead><tbody>${renderHTML({ nodes: node.rows, components })}</tbody></table>`;
+          return `<table><thead>${renderNode([node.header])}</thead><tbody>${renderNode(
+            node.rows,
+          )}</tbody></table>`;
         }
         case 'tableRow': {
-          return `<tr>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</tr>`;
+          return `<tr>${renderNode(node.children)}</tr>`;
         }
         case 'tableHeader': {
-          return `<th>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</th>`;
+          return `<th>${renderNode(node.children)}</th>`;
         }
         case 'tableData': {
-          return `<td>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</td>`;
+          return `<td>${renderNode(node.children)}</td>`;
         }
         case 'paragraph': {
-          return `<p>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</p>`;
+          return `<p>${renderNode(node.children)}</p>`;
         }
         case 'strong': {
-          return `<em>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</em>`;
+          return `<em>${renderNode(node.children)}</em>`;
         }
-        case 'italic': {
-          return `<i>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</i>`;
+        case 'emphasis': {
+          return `<i>${renderNode(node.children)}</i>`;
         }
         case 'strikeThrough': {
-          return `<del>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</del>`;
+          return `<del>${renderNode(node.children)}</del>`;
         }
         case 'subscript': {
-          return `<sub>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</sub>`;
+          return `<sub>${renderNode(node.children)}</sub>`;
         }
         case 'superscript': {
-          return `<sup>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</sup>`;
+          return `<sup>${renderNode(node.children)}</sup>`;
         }
         case 'blockquote': {
-          return `<blockquote>${renderHTML({
-            nodes: node.children,
-            components,
-          })}</blockquote>`;
+          return `<blockquote>${renderNode(node.children)}</blockquote>`;
         }
         default: {
           return `<span style={{ color: 'red' }}>
@@ -171,4 +87,4 @@ export const renderHTML = ({ nodes, components }: MarkdownASTRendererProps): str
         }
       }
     })
-    .join('');
+    .join('\n');

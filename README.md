@@ -3,34 +3,25 @@
 ## Install
 
 ```sh
-yarn add @saartje87/md-ast
+yarn add @md-parser/html-renderer
 ```
 
 ## Usage
 
 ```ts
-import { parseMarkdown } from '@saartje87/md-ast';
+import { renderHTML } from '@md-parser/html-renderer';
 
-const ast = parseMarkdown('# Hello World');
+const html = renderHTML('# Hello World');
 ```
 
-### With options
+### Presets
 
 ```ts
-import { parseMarkdown } from '@saartje87/md-ast';
+import { parseMarkdown, GFM } from '@saartje87/md-ast';
 
-const ast = parseMarkdown('# Hello World', {
-  expressions: [],
+const ast = renderHTML('# Hello World', {
+  presets: [GFM()],
 });
 ```
 
-## TODO
-
-- [ ] Task list `- [ ] Task` `- [x] Finished Task`
-- [ ] Character encoding `& > <` -> `&amp; &lt; &gt`;
-- [ ] Well formed HTML entities can be written inline directly. If you write &copy;, it will appear in the HTML output as ©.
-- [ ] Parse multiline emphasis `*foo\nbar*` -> `<em>foo<br />bar</em>`
-- [ ] Table cells, remove trailing spaces
-
-https://www.markdownguide.org/extended-syntax
-https://spec-md.com/
+See [@md-parser/parser](https://github.com/md-parser/parser) for more options options.
