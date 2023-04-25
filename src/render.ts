@@ -1,6 +1,6 @@
 import { parseMarkdown, MarkdownNode, ParserConfig } from '@md-parser/parser';
 
-export const renderHTML = (markdown: string, config: ParserConfig) => {
+export const renderHTML = (markdown: string, config?: ParserConfig) => {
   const nodes = parseMarkdown(markdown, config);
 
   return renderNode(nodes);
